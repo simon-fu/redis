@@ -171,8 +171,10 @@ REDIS_BENCHMARK_NAME=redis-benchmark
 REDIS_BENCHMARK_OBJ=ae.o anet.o redis-benchmark.o adlist.o zmalloc.o redis-benchmark.o
 REDIS_CHECK_RDB_NAME=redis-check-rdb
 REDIS_CHECK_AOF_NAME=redis-check-aof
+REDIS_CRPASS_NAME=redis-crpass
+REDIS_CRPASS_OBJ=crpass_main.o zmalloc.o tiny_aes.o crpass.o
 
-all: $(REDIS_SERVER_NAME) $(REDIS_SENTINEL_NAME) $(REDIS_CLI_NAME) $(REDIS_BENCHMARK_NAME) $(REDIS_CHECK_RDB_NAME) $(REDIS_CHECK_AOF_NAME)
+all: $(REDIS_SERVER_NAME) $(REDIS_SENTINEL_NAME) $(REDIS_CLI_NAME) $(REDIS_BENCHMARK_NAME) $(REDIS_CHECK_RDB_NAME) $(REDIS_CHECK_AOF_NAME) $(REDIS_CRPASS_NAME)
 	@echo ""
 	@echo "Hint: It's a good idea to run 'make test' ;)"
 	@echo ""
@@ -241,6 +243,10 @@ $(REDIS_BENCHMARK_NAME): $(REDIS_BENCHMARK_OBJ)
 dict-benchmark: dict.c zmalloc.c sds.c siphash.c
 	$(REDIS_CC) $(FINAL_CFLAGS) $^ -D DICT_BENCHMARK_MAIN -o $@ $(FINAL_LIBS)
 
+# redis-crpass
+$(REDIS_CRPASS_NAME): $(REDIS_CRPASS_OBJ)
+	$(REDIS_LD) -o $@ $^ $(FINAL_LIBS)
+
 # Because the jemalloc.h header is generated as a part of the jemalloc build,
 # building it should complete before building any other object. Instead of
 # depending on a single artifact, build all dependencies first.
@@ -248,7 +254,7 @@ dict-benchmark: dict.c zmalloc.c sds.c siphash.c
 	$(REDIS_CC) -c $<
 
 clean:
-	rm -rf $(REDIS_SERVER_NAME) $(REDIS_SENTINEL_NAME) $(REDIS_CLI_NAME) $(REDIS_BENCHMARK_NAME) $(REDIS_CHECK_RDB_NAME) $(REDIS_CHECK_AOF_NAME) *.o *.gcda *.gcno *.gcov redis.info lcov-html Makefile.dep dict-benchmark
+	rm -rf $(REDIS_SERVER_NAME) $(REDIS_SENTINEL_NAME) $(REDIS_CLI_NAME) $(REDIS_BENCHMARK_NAME) $(REDIS_CHECK_RDB_NAME) $(REDIS_CHECK_AOF_NAME) $(REDIS_CRPASS_NAME) *.o *.gcda *.gcno *.gcov redis.info lcov-html Makefile.dep dict-benchmark
 
 .PHONY: clean
 
@@ -309,7 +315,8 @@ install: all
 	$(REDIS_INSTALL) $(REDIS_CLI_NAME) $(INSTALL_BIN)
 	$(REDIS_INSTALL) $(REDIS_CHECK_RDB_NAME) $(INSTALL_BIN)
 	$(REDIS_INSTALL) $(REDIS_CHECK_AOF_NAME) $(INSTALL_BIN)
+	$(REDIS_INSTALL) $(REDIS_CRPASS_NAME) $(INSTALL_BIN)
 	@ln -sf $(REDIS_SERVER_NAME) $(INSTALL_BIN)/$(REDIS_SENTINEL_NAME)
 
 uninstall:
-	rm -f $(INSTALL_BIN)/{$(REDIS_SERVER_NAME),$(REDIS_BENCHMARK_NAME),$(REDIS_CLI_NAME),$(REDIS_CHECK_RDB_NAME),$(REDIS_CHECK_AOF_NAME),$(REDIS_SENTINEL_NAME)}
+	rm -f $(INSTALL_BIN)/{$(REDIS_SERVER_NAME),$(REDIS_BENCHMARK_NAME),$(REDIS_CLI_NAME),$(REDIS_CHECK_RDB_NAME),$(REDIS_CHECK_AOF_NAME),$(REDIS_SENTINEL_NAME),$(REDIS_CRPASS_NAME)}

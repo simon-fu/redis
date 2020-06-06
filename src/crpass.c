@@ -4,11 +4,55 @@
 #include "server.h"
 
 
+
+#define MAKE_STR1(x) #x
+#define MAKE_STR2(R)  MAKE_STR1(R)
+
+static uint8_t * make_key_from_str(const char * s){
+    static uint8_t key[16];
+
+    size_t plain_len;
+    size_t plain_remains;
+    size_t j;
+
+    memset(key, 0, 16);
+
+    if(!s || s[0] == '\0'){
+        s = "it's a secret";
+    }
+
+    plain_len = strlen(s);
+    plain_remains = plain_len;
+    while( plain_remains > 0 ){
+        if(plain_remains < 16){
+            for(j = 0; j < plain_remains; j++){
+                key[j] += s[j];
+            }
+            s += plain_remains;
+            plain_remains = 0;
+        }else{
+            for(j = 0; j < 16; j++){
+                key[j] += s[j];
+            }
+            s += 16;
+            plain_remains -= 16;
+        }
+    } // while
+
+    return key;
+}
+
 static const uint8_t * get_interanl_key(){
-    static uint8_t key[] = { 
-        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c 
-    };
+    // static uint8_t key[] = { 
+    //     0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+    //     0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c 
+    // };
+    // return key;
+
+    static uint8_t * key = NULL;
+    if(!key){
+        key = make_key_from_str(MAKE_STR2(CRPASS_KEY));
+    }
     return key;
 }
 

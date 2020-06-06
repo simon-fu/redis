@@ -1,3 +1,9 @@
+How to build crpass
+-------------------
+build with CRPASS_KEY for hardcode key, example:
+    % make CFLAGS="-DCRPASS_KEY=123"
+
+
 This README is just a fast *quick start* document. You can find more detailed documentation at [redis.io](https://redis.io).
 
 What is Redis?
