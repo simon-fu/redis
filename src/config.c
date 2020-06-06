@@ -30,6 +30,7 @@
 
 #include "server.h"
 #include "cluster.h"
+#include "crpass.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -531,7 +532,17 @@ void loadServerConfigFromString(char *config) {
                 err = "Password is longer than CONFIG_AUTHPASS_MAX_LEN";
                 goto loaderr;
             }
-            server.requirepass = argv[1][0] ? zstrdup(argv[1]) : NULL;
+            // server.requirepass = argv[1][0] ? zstrdup(argv[1]) : NULL;
+            server.requirepass = crpass_decrypt(argv[1]);
+        } else if (!strcasecmp(argv[0],"crpass_test") && argc == 2) {
+            exit(crpass_verification_test(argv[1]));
+
+        } else if (!strcasecmp(argv[0],"crpass_encrypt") && argc == 2) {
+            exit(crpass_encrypt_test(argv[1]));
+
+        } else if (!strcasecmp(argv[0],"crpass_decrypt") && argc == 2) {
+            exit(crpass_decrypt_test(argv[1]));
+
         } else if (!strcasecmp(argv[0],"pidfile") && argc == 2) {
             zfree(server.pidfile);
             server.pidfile = zstrdup(argv[1]);
