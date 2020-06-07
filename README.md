@@ -3,6 +3,11 @@ How to build crpass
 build with defined CRPASS_SALT and CRPASS_ROUNDS, example:
     % make CFLAGS="-DCRPASS_SALT=salt -DCRPASS_ROUNDS=1000"
 
+Run crpass generate requirepass 
+-------------------------------
+    % cd src
+    % ./redis-crpass --encrypt abc
+
 
 This README is just a fast *quick start* document. You can find more detailed documentation at [redis.io](https://redis.io).
 
