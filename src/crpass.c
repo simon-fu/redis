@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
-
-#include "server.h"
+#include <stdio.h>
+#include "zmalloc.h"
 #include "crpass.h"
 
 #define PBKDF2_SHA256_STATIC
@@ -279,12 +279,6 @@ int crpass_verification_test(const char *s) {
 
 int crpass_encrypt_test(const char *s) {
     char * crypt_txt;
-
-    if (strlen(s) > (CONFIG_AUTHPASS_MAX_LEN)) {
-        printf("Password is longer than CONFIG_AUTHPASS_MAX_LEN\n");
-        return 1;
-    }
-
     crypt_txt = crpass_encrypt(s);
     if(crypt_txt){
         printf("encrypt: [%s] -> [%s]\n", s, crypt_txt);
