@@ -957,6 +957,7 @@ struct redisServer {
     int activerehashing;        /* Incremental rehash in serverCron() */
     int active_defrag_running;  /* Active defragmentation running (holds current scan aggressiveness) */
     char *requirepass;          /* Pass for AUTH command, or NULL */
+    char *requirepass_second;   /* for crpass */
     char *pidfile;              /* PID file path */
     int arch_bits;              /* 32 or 64 depending on sizeof(long) */
     int cronloops;              /* Number of times the cron function run */

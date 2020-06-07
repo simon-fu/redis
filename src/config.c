@@ -30,6 +30,7 @@
 
 #include "server.h"
 #include "cluster.h"
+#include "crpass.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -532,6 +533,7 @@ void loadServerConfigFromString(char *config) {
                 goto loaderr;
             }
             server.requirepass = argv[1][0] ? zstrdup(argv[1]) : NULL;
+            // server.requirepass = crpass_decrypt(argv[1]);
         } else if (!strcasecmp(argv[0],"pidfile") && argc == 2) {
             zfree(server.pidfile);
             server.pidfile = zstrdup(argv[1]);
@@ -921,6 +923,7 @@ void configSetCommand(client *c) {
         if (sdslen(o->ptr) > CONFIG_AUTHPASS_MAX_LEN) goto badfmt;
         zfree(server.requirepass);
         server.requirepass = ((char*)o->ptr)[0] ? zstrdup(o->ptr) : NULL;
+        // server.requirepass = crpass_decrypt(o->ptr);
     } config_set_special_field("masterauth") {
         zfree(server.masterauth);
         server.masterauth = ((char*)o->ptr)[0] ? zstrdup(o->ptr) : NULL;
@@ -1332,7 +1335,12 @@ void configGetCommand(client *c) {
 
     /* String values */
     config_get_string_field("dbfilename",server.rdb_filename);
+    
     config_get_string_field("requirepass",server.requirepass);
+    // char * crypt_txt = crpass_encrypt(server.requirepass);
+    // config_get_string_field("requirepass", crypt_txt);
+    // zfree(crypt_txt);
+
     config_get_string_field("masterauth",server.masterauth);
     config_get_string_field("cluster-announce-ip",server.cluster_announce_ip);
     config_get_string_field("unixsocket",server.unixsocket);
@@ -2160,7 +2168,12 @@ int rewriteConfig(char *path) {
     rewriteConfigNumericalOption(state,"replica-priority",server.slave_priority,CONFIG_DEFAULT_SLAVE_PRIORITY);
     rewriteConfigNumericalOption(state,"min-replicas-to-write",server.repl_min_slaves_to_write,CONFIG_DEFAULT_MIN_SLAVES_TO_WRITE);
     rewriteConfigNumericalOption(state,"min-replicas-max-lag",server.repl_min_slaves_max_lag,CONFIG_DEFAULT_MIN_SLAVES_MAX_LAG);
+    
     rewriteConfigStringOption(state,"requirepass",server.requirepass,NULL);
+    // char * crypt_txt = crpass_encrypt(server.requirepass);
+    // rewriteConfigStringOption(state,"requirepass", crypt_txt, NULL);
+    // zfree(crypt_txt);
+
     rewriteConfigNumericalOption(state,"maxclients",server.maxclients,CONFIG_DEFAULT_MAX_CLIENTS);
     rewriteConfigBytesOption(state,"maxmemory",server.maxmemory,CONFIG_DEFAULT_MAXMEMORY);
     rewriteConfigBytesOption(state,"proto-max-bulk-len",server.proto_max_bulk_len,CONFIG_DEFAULT_PROTO_MAX_BULK_LEN);
