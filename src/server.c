@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "crpass.h"
 #include "server.h"
 #include "cluster.h"
 #include "slowlog.h"
@@ -1588,6 +1589,7 @@ void initServerConfig(void) {
     server.rdb_filename = zstrdup(CONFIG_DEFAULT_RDB_FILENAME);
     server.aof_filename = zstrdup(CONFIG_DEFAULT_AOF_FILENAME);
     server.requirepass = NULL;
+    server.requirepass_second = NULL;
     server.rdb_compression = CONFIG_DEFAULT_RDB_COMPRESSION;
     server.rdb_checksum = CONFIG_DEFAULT_RDB_CHECKSUM;
     server.stop_writes_on_bgsave_err = CONFIG_DEFAULT_STOP_WRITES_ON_BGSAVE_ERROR;
@@ -2900,7 +2902,8 @@ int time_independent_strcmp(char *a, char *b) {
 void authCommand(client *c) {
     if (!server.requirepass) {
         addReplyError(c,"Client sent AUTH, but no password is set");
-    } else if (!time_independent_strcmp(c->argv[1]->ptr, server.requirepass)) {
+    //} else if (!time_independent_strcmp(c->argv[1]->ptr, server.requirepass)) {
+    } else if (crpass_verify(c->argv[1]->ptr, server.requirepass, &server.requirepass_second)==0){
       c->authenticated = 1;
       addReply(c,shared.ok);
     } else {

@@ -3,8 +3,6 @@
 #include <strings.h>
 #include "crpass.h"
 
-// #define MAKE_STR1(x) #x
-// #define MAKE_STR2(R)  MAKE_STR1(R)
 
 static void print_usage(const char * argv0){
     printf("%s --test [plain-password]\n", argv0);
@@ -13,9 +11,6 @@ static void print_usage(const char * argv0){
 }
 
 int main(int argc, char **argv) {
-
-    // const char * key = MAKE_STR2(CRPASS_KEY);
-    // printf("key=[%s]\n", key);
 
     if(argc != 3){
         print_usage(argv[0]);
